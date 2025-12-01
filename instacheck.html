@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Instagram ID Verifier — CyberShield</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+:root{
+  --bg:#071022; 
+  --panel:#0b1220; 
+  --muted:#9fb0c8;
+  --accent1:#6ee7b7; 
+  --accent2:#60a5fa; 
+  --danger:#ff6b6b; 
+  --good:#34d399;
+}
+
+*{box-sizing:border-box;}
+html,body{
+  height:100%;
+  margin:0;
+  font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial;
+  color:var(--muted);
+  background:linear-gradient(180deg,var(--bg),#04121b);
+  -webkit-font-smoothing:antialiased;
+}
+
+.wrap{
+  max-width:800px;
+  margin:28px auto;
+  padding:20px;
+}
+
+header{
+  text-align:center;
+  margin-bottom:20px;
+}
+
+h1{
+  color:var(--accent2);
+  margin:0;
+  font-size:24px;
+  text-shadow:0 0 4px #60a5fa,0 0 8px #6ee7b7;
+  animation: glow 2.5s infinite alternate;
+}
+
+@keyframes glow{
+  0%{ text-shadow:0 0 2px #60a5fa,0 0 6px #6ee7b7; }
+  50%{ text-shadow:0 0 8px #60a5fa,0 0 16px #6ee7b7; }
+  100%{ text-shadow:0 0 4px #60a5fa,0 0 10px #6ee7b7; }
+}
+
+p.lead{
+  margin:8px 0 0;
+  color:var(--muted);
+  font-size:14px;
+}
+
+.inputRow{
+  display:flex;
+  gap:8px;
+  margin-top:20px;
+  flex-wrap:wrap;
+}
+
+input[type="text"]{
+  flex:1;
+  padding:12px;
+  border-radius:10px;
+  border:1px solid rgba(255,255,255,0.03);
+  background:transparent;
+  color:var(--muted);
+  outline:none;
+  font-size:15px;
+  transition:border 0.3s, box-shadow 0.3s;
+}
+input[type="text"]:focus{
+  border-color:var(--accent2);
+  box-shadow:0 0 8px var(--accent2);
+}
+
+button{
+  padding:10px 14px;
+  border-radius:10px;
+  border:0;
+  background:linear-gradient(90deg,var(--accent1),var(--accent2));
+  color:#022;
+  font-weight:700;
+  cursor:pointer;
+  transition:transform 0.2s, box-shadow 0.3s;
+}
+button:hover{
+  transform: scale(1.05);
+  box-shadow:0 0 10px var(--accent1),0 0 15px var(--accent2);
+}
+
+.resultCard{
+  margin-top:20px;
+  background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+  padding:16px;
+  border-radius:12px;
+  border:1px solid rgba(255,255,255,0.03);
+  backdrop-filter:blur(8px);
+  animation: fadeIn 0.5s ease forwards;
+}
+@keyframes fadeIn{
+  0%{opacity:0; transform:translateY(8px);}
+  100%{opacity:1; transform:translateY(0);}
+}
+
+.score{
+  font-size:20px;
+  font-weight:900;
+  margin-top:12px;
+}
+.observations{
+  margin-top:10px;
+  display:grid;
+  gap:6px;
+}
+.obs{
+  background:rgba(0,0,0,0.18);
+  padding:8px;
+  border-radius:8px;
+  font-size:14px;
+  color:var(--muted);
+}
+
+footer{
+  text-align:center;
+  color:var(--muted);
+  font-size:13px;
+  margin-top:20px;
+}
+
+@media (max-width:600px){
+  .inputRow{flex-direction:column;}
+}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <h1>Instagram ID Verifier</h1>
+    <p class="lead">Check if an Instagram username is likely fake, suspicious, or risky.</p>
+  </header>
+
+  <div class="inputRow">
+    <input id="instaInput" type="text" placeholder="Enter Instagram ID">
+    <button onclick="checkInsta()">Verify</button>
+    <button onclick="clearAll()">Clear</button>
+  </div>
+
+  <div class="resultCard" id="resultCard" style="display:none;">
+    <div class="score" id="scoreVal">Score: 0</div>
+    <div class="observations" id="observations"></div>
+    <div style="margin-top:10px;">
+      <button onclick="copyReport()">Copy Report</button>
+    </div>
+  </div>
+  
+  <footer>© 2025 CyberShield Project — Instagram Verification</footer>
+</div>
+
+<script>
+const suspiciousPatterns = [
+  /\d{4,}/, // many numbers
+  /free|giveaway|promo|discount/i,
+  /official/i
+];
+const popularAccounts = ["instagram","facebook","paypal","google","netflix"];
+
+const instaInput = document.getElementById('instaInput');
+const resultCard = document.getElementById('resultCard');
+const scoreVal = document.getElementById('scoreVal');
+const observations = document.getElementById('observations');
+
+function checkInsta(){
+  const id = instaInput.value.trim().toLowerCase();
+  if(!id){ alert("Enter an Instagram ID"); return; }
+
+  let score = 50;
+  const notes = [];
+
+  // length check
+  if(id.length < 3 || id.length > 30){
+    score += 20;
+    notes.push("Unusual username length");
+  } else {
+    notes.push("Username length normal");
+  }
+
+  // suspicious patterns
+  suspiciousPatterns.forEach(p=>{
+    if(p.test(id)){
+      score += 20;
+      notes.push(`Suspicious pattern detected: ${p}`);
+    }
+  });
+
+  // popular brand checks
+  popularAccounts.forEach(p=>{
+    if(id.includes(p) && id!==p){
+      score += 25;
+      notes.push(`Mimics popular account: ${p}`);
+    }
+  });
+
+  if(score > 100) score = 100;
+  if(score < 0) score = 0;
+
+  resultCard.style.display = "block";
+  scoreVal.textContent = `Suspicious Score: ${score}`;
+  observations.innerHTML = '';
+  notes.forEach(n=>{
+    const div = document.createElement('div');
+    div.className='obs';
+    div.textContent = n;
+    observations.appendChild(div);
+  });
+}
+
+function clearAll(){
+  instaInput.value='';
+  resultCard.style.display='none';
+  observations.innerHTML='';
+  scoreVal.textContent='Score: 0';
+}
+
+function copyReport(){
+  const id = instaInput.value || "(empty)";
+  const score = scoreVal.textContent;
+  const notes = Array.from(observations.children).map(n=>n.textContent);
+  const txt = `CyberShield Instagram Report\nID: ${id}\n${score}\nNotes:\n- ${notes.join('\n- ')}\n(Heuristic only)`;
+  navigator.clipboard.writeText(txt).then(()=>alert("Report copied to clipboard"));
+}
+
+// Optional: live checking
+instaInput.addEventListener('input',()=>{
+  if(instaInput.value.length>3) checkInsta();
+});
+</script>
+
+</body>
+</html>

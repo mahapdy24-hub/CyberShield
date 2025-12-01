@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>CyberShield – Dashboard</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+body {
+    margin: 0;
+    font-family: "Poppins", sans-serif;
+    background: #0d1117;
+    color: white;
+    overflow-x: hidden;
+}
+
+/* Header */
+.header {
+   width: 100%;
+    padding: 20px;
+    text-align: center;
+    background: #161b22;
+    border-bottom: 1px solid #30363d;
+}
+.header h1 {
+     margin: 0;
+    font-size: 32px;
+    background: linear-gradient(90deg, #58a6ff, #00ffa6);
+    -webkit-background-clip: text;
+    color: transparent;
+    animation: glow 3s infinite alternate;
+}
+.header p {
+    color: #9fb0c8;
+    margin: 5px 0 0 0;
+}
+@keyframes glow {
+    0% { filter: drop-shadow(0 0 5px #58a6ff); }
+    50% { filter: drop-shadow(0 0 15px #00ffa6); }
+    100% { filter: drop-shadow(0 0 5px #58a6ff); }
+}
+
+/* Dashboard Grid */
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 25px;
+    padding: 30px;
+}
+
+/* Dashboard Cards */
+.card {
+    background: #161b22;
+    padding: 25px;
+    border-radius: 15px;
+    border: 1px solid #30363d;
+    transition: transform 0.4s, box-shadow 0.4s;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    perspective: 1000px; /* for tilt effect */
+}
+
+/* Neon Glow & Tilt on hover */
+.card::before {
+    content: "";
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, #1f6feb33, transparent 70%);
+    transition: 0.4s;
+    opacity: 0;
+    transform: rotate(45deg)scale(0.8);
+    animation: pulse 3s infinite alternate;
+}
+@keyframes pulse {
+    0% { transform: rotate(45deg) scale(0.9); opacity: 0.3; }
+    50% { transform: rotate(45deg) scale(1); opacity: 0.6; }
+    100% { transform: rotate(45deg) scale(0.9); opacity: 0.3; }
+}
+.card:hover::before {
+    opacity: 1;
+}
+.card:hover {
+    transform: translateY(-10px) rotateX(5deg) rotateY(5deg);
+    box-shadow: 0 0 25px #1f6feb55, 0 0 40px #00ffa655;
+    border-color: #1f6feb;
+}
+
+/* Card Title */
+.card h2 {
+    margin: 0;
+    color: #58a6ff;
+   font-size: 20px;
+    transition: transform 0.3s, color 0.3s;
+}
+.card:hover h2 {
+    transform: scale(1.05);
+      color: #00ffa6;
+}
+.card p {
+    margin-top: 8px;
+    font-size: 14px;
+    color: #cfd8dc;
+    transition: color 0.3s;
+}
+.card:hover p { color: #a0e7ff; }
+
+/* Small Stats Badge */
+.badge {
+    margin-top: 15px;
+    display: inline-block;
+    padding: 6px 10px;
+    background: #238636;
+    border-radius: 8px;
+    font-size: 12px;
+    transition: background 0.3s, transform 0.3s,  box-shadow 0.3s;
+}
+.card:hover .badge {
+    background: #2ea043;
+    transform: scale(1.1);
+    box-shadow: 0 0 8px #2ea04355;
+}
+
+/* Footer */
+.footer {
+    text-align: center;
+    opacity: 0.6;
+    padding-bottom: 20px;
+}
+
+/* Responsive Mobile & Landscape */
+@media (max-width: 768px) {
+    .grid {
+          grid-template-columns: 1fr; padding: 15px; }
+    .card { padding: 20px; }
+}
+
+@media (orientation: landscape) and (max-height: 500px) {
+    .grid {
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 15px;
+    }
+    .card {
+        padding: 18px;
+    }
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+    <h1>CyberShield – Dashboard</h1>
+    <p>Quick access to all security tools</p>
+</div>
+
+<div class="grid">
+
+    <div class="card" onclick="go('checker.html')">
+        <h2>🔍 URL Scam Checker</h2>
+        <p>Scan links instantly and detect scam websites.</p>
+        <div class="badge">Real-time Scanner</div>
+    </div>
+
+    <div class="card" onclick="go('emailcheck.html')">
+        <h2>📩 Email Verifier</h2>
+        <p>Check fake or real email identity using smart rules.</p>
+        <div class="badge">AI Rules</div>
+    </div>
+
+    <div class="card" onclick="go('instacheck.html')">
+        <h2>📱 Instagram ID Check</h2>
+        <p>Verify account authenticity before trusting it.</p>
+        <div class="badge">Fraud Filters</div>
+    </div>
+
+    <div class="card" onclick="go('qrscan.html')">
+        <h2>📷 QR Code Scan</h2>
+        <p>Detect malicious QR codes safely.</p>
+        <div class="badge">Safe Scanner</div>
+    </div>
+
+    <div class="card" onclick="go('database.html')">
+        <h2>📁 Scam Database</h2>
+        <p>Offline list of known phishing & scam sites.</p>
+        <div class="badge">Local Storage</div>
+    </div>
+
+    <div class="card" onclick="go('tutorial.html')">
+        <h2>🎓 Cyber Safety Learn</h2>
+        <p>Learn how to stay safe from scams.</p>
+        <div class="badge">Beginner Friendly</div>
+    </div>
+
+    <div class="card" onclick="go('report.html')">
+        <h2>🚨 Report Suspicious Link</h2>
+        <p>Submit any dangerous website for review.</p>
+        <div class="badge">User Report</div>
+    </div>
+
+    <div class="card" onclick="go('about.html')">
+        <h2>ℹ About / Contact</h2>
+        <p>Know more about our project & team.</p>
+        <div class="badge">Support</div>
+    </div>
+
+</div>
+
+<div class="footer">© 2025 CyberShield Project</div> 
+
+<script>
+function go(page) {
+    window.location.href = page;
+}
+</script>
+
+</body>
+</html>

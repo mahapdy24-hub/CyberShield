@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>CyberShield — Report Suspicious Link</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+body {
+    margin:0;
+    font-family:"Poppins", sans-serif;
+    background:#0d1117;
+    color:#fff;
+    padding:20px;
+}
+
+/* Header */
+.header {
+    text-align:center;
+    margin-bottom:20px;
+}
+.header h1 {
+    font-size:32px;
+    margin-bottom:6px;
+    background: linear-gradient(90deg, #6ee7b7, #60a5fa);
+    -webkit-background-clip: text;
+    color: transparent;
+    animation: glow 3s infinite alternate;
+}
+.header p {
+    color:#9fb0c8;
+    font-size:14px;
+}
+@keyframes glow {
+    0%{filter:drop-shadow(0 0 5px #6ee7b7);}
+    50%{filter:drop-shadow(0 0 15px #60a5fa);}
+    100%{filter:drop-shadow(0 0 5px #6ee7b7);}
+}
+
+/* Form */
+.formRow {
+    max-width:700px;
+    margin:auto;
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+    margin-bottom:20px;
+}
+input, textarea {
+    padding:12px;
+    border-radius:10px;
+    border:1px solid rgba(255,255,255,0.05);
+    background:#161b22;
+    color:#fff;
+    width:100%;
+    font-size:14px;
+    outline:none;
+}
+button {
+    padding:12px;
+    border:none;
+    border-radius:10px;
+    background:#238636;
+    color:#fff;
+    font-weight:700;
+    cursor:pointer;
+    transition:0.3s;
+}
+button:hover{background:#2ea043;}
+
+/* Reports List */
+.reportList {
+    max-width:700px;
+    margin:auto;
+    border-radius:12px;
+    border:1px solid rgba(255,255,255,0.03);
+    background:rgba(255,255,255,0.02);
+    padding:12px;
+    max-height:400px;
+    overflow:auto;
+}
+.reportItem {
+    padding:10px;
+    border-radius:8px;
+    border-bottom:1px solid rgba(255,255,255,0.05);
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+.reportItem:last-child{border-bottom:none;}
+.reportItem button {
+    padding:6px 10px;
+    font-size:12px;
+    background:#e63946;
+    color:#fff;
+}
+.reportItem button:hover{background:#ff4c4c;}
+
+/* Footer */
+.footer {
+    text-align:center;
+    margin-top:20px;
+    font-size:12px;
+    opacity:0.6;
+}
+
+/* Responsive */
+@media(max-width:768px){
+    .formRow, .reportList{width:100%;}
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+    <h1>🚨 Report Suspicious Link</h1>
+    <p>Submit any dangerous or suspicious URL safely. Data is stored locally for demo purposes.</p>
+</div>
+
+<div class="formRow">
+    <input type="text" id="reportURL" placeholder="Enter suspicious URL (example: http://bad-site.com)">
+    <textarea id="reportNote" rows="3" placeholder="Optional note or description"></textarea>
+    <button onclick="addReport()">Submit Report</button>
+    <button style="background:#60a5fa;" onclick="clearReports()">Clear All Reports</button>
+</div>
+
+<div class="reportList" id="reportList">
+    <!-- Dynamic reports -->
+</div>
+
+<div class="footer">
+    CyberShield — Reports are stored locally in your browser (localStorage).
+</div>
+
+<script>
+let reports = [];
+const REPORT_KEY = 'cybershield_reports_v1';
+
+function loadReports(){
+    try{
+        const stored = JSON.parse(localStorage.getItem(REPORT_KEY));
+        if(Array.isArray(stored)) reports = stored;
+    }catch(e){ reports=[]; }
+    renderReports();
+}
+
+function saveReports(){
+    localStorage.setItem(REPORT_KEY, JSON.stringify(reports));
+}
+
+function renderReports(){
+    const container = document.getElementById('reportList');
+    container.innerHTML='';
+    if(!reports.length){
+        container.innerHTML='<p style="color:#9fb0c8;">No reports submitted yet.</p>';
+        return;
+    }
+    reports.forEach((r,i)=>{
+        const div = document.createElement('div');
+        div.className='reportItem';
+        div.innerHTML = `<div>
+            <strong>${r.url}</strong><br>
+            <small>${r.note}</small>
+        </div>`;
+        const rm = document.createElement('button');
+        rm.textContent='Remove';
+        rm.onclick = ()=>{ reports.splice(i,1); saveReports(); renderReports(); };
+        div.appendChild(rm);
+        container.appendChild(div);
+    });
+}
+
+function addReport(){
+    const url = document.getElementById('reportURL').value.trim();
+    const note = document.getElementById('reportNote').value.trim();
+    if(!url) return alert('Enter a URL to report');
+    reports.unshift({url,note});
+    saveReports();
+    renderReports();
+    document.getElementById('reportURL').value='';
+    document.getElementById('reportNote').value='';
+}
+
+function clearReports(){
+    if(!confirm('Are you sure you want to clear all reports?')) return;
+    reports=[];
+    saveReports();
+    renderReports();
+}
+
+loadReports();
+</script>
+
+</body>
+</html>

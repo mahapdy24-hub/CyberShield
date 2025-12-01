@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>CyberShield — QR Code Scanner</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+body {
+    margin:0;
+    font-family: "Poppins", sans-serif;
+    background: #0d1117;
+    color: #fff;
+    text-align: center;
+    padding: 20px;
+}
+
+h1 {
+    font-size: 28px;
+    margin-bottom: 6px;
+    background: linear-gradient(90deg, #6ee7b7, #60a5fa);
+    -webkit-background-clip: text;
+    color: transparent;
+    animation: glow 3s infinite alternate;
+}
+@keyframes glow {
+    from { filter: drop-shadow(0 0 5px #6ee7b7); }
+    to { filter: drop-shadow(0 0 15px #60a5fa); }
+}
+
+p.lead { color: #9fb0c8; margin-bottom: 20px; font-size: 14px; }
+
+input[type=file], button {
+    padding: 12px;
+    border-radius: 10px;
+    border: none;
+    margin-top: 12px;
+    width: 250px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+input[type=file] {
+    background: #161b22;
+    color: #fff;
+}
+
+button {
+    background: #238636;
+    color: #fff;
+    font-weight: bold;
+    transition: 0.3s;
+    margin-right: 6px;
+}
+button:hover { background: #2ea043; }
+
+#preview {
+    margin-top: 20px;
+    max-width: 300px;
+    max-height: 300px;
+    border-radius: 12px;
+    border: 1px solid #30363d;
+    display: none;
+}
+
+#result {
+    margin-top: 18px;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+footer {
+    margin-top: 40px;
+    font-size: 12px;
+    opacity: 0.6;
+}
+</style>
+</head>
+<body>
+
+<h1>📷 QR Code Scanner</h1>
+<p class="lead">Upload an image or use camera to scan QR codes safely. (Demo mode)</p>
+
+<input type="file" id="qrInput" accept="image/*">
+<br>
+<button id="scanBtn">Simulate Scan</button>
+<button id="clearBtn">Clear</button>
+
+<img id="preview" alt="QR Preview">
+<div id="result">No QR code scanned yet.</div>
+
+<footer>CyberShield — Safe Demo Mode. No data leaves your device.</footer>
+
+<script>
+const qrInput = document.getElementById('qrInput');
+const preview = document.getElementById('preview');
+const result = document.getElementById('result');
+const scanBtn = document.getElementById('scanBtn');
+const clearBtn = document.getElementById('clearBtn');
+
+let lastFileData = null;
+
+// Display selected image
+qrInput.addEventListener('change', (e)=>{
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(ev){
+        preview.src = ev.target.result;
+        preview.style.display = 'block';
+        lastFileData = ev.target.result;
+    };
+    reader.readAsDataURL(file);
+});
+
+// Simulate QR scan
+scanBtn.addEventListener('click', ()=>{
+    if (!lastFileData) return alert('Select a QR image first.');
+    // Demo: alert with fake QR decoded data
+    const fakeQRs = [
+        'https://example.com/login',
+        'https://malicious-site.net',
+        'https://free-gift-reward.io',
+        'https://safe-bank.com',
+        'https://cybershield.training'
+    ];
+    const decoded = fakeQRs[Math.floor(Math.random()*fakeQRs.length)];
+    result.textContent = 'QR Decoded: ' + decoded;
+    alert('QR Code scanned! (Demo) \nDecoded URL: ' + decoded);
+});
+
+// Clear button functionality
+clearBtn.addEventListener('click', ()=>{
+    qrInput.value = '';
+    preview.src = '';
+    preview.style.display = 'none';
+    result.textContent = 'No QR code scanned yet.';
+    lastFileData = null;
+});
+</script>
+
+</body>
+</html>

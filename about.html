@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>CyberShield — About / Contact</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+body {
+    margin:0;
+    font-family:"Poppins", sans-serif;
+    background:#0d1117;
+    color:#fff;
+    padding:20px;
+    line-height:1.6;
+}
+
+/* Header */
+.header {
+    text-align:center;
+    margin-bottom:20px;
+}
+.header h1 {
+    font-size:32px;
+    margin-bottom:6px;
+    background: linear-gradient(90deg, #6ee7b7, #60a5fa);
+    -webkit-background-clip: text;
+    color: transparent;
+    animation: glow 3s infinite alternate;
+}
+.header p {
+    color:#9fb0c8;
+    font-size:14px;
+}
+@keyframes glow {
+    0%{filter:drop-shadow(0 0 5px #6ee7b7);}
+    50%{filter:drop-shadow(0 0 15px #60a5fa);}
+    100%{filter:drop-shadow(0 0 5px #6ee7b7);}
+}
+
+/* Section styles */
+.section {
+    max-width:800px;
+    margin:auto;
+    background:rgba(255,255,255,0.02);
+    padding:20px;
+    border-radius:12px;
+    border:1px solid rgba(255,255,255,0.03);
+    margin-bottom:20px;
+}
+.section h2 {
+    color:#58a6ff;
+    margin-bottom:10px;
+    font-size:22px;
+}
+.section p {
+    color:#c0c8d0;
+    font-size:14px;
+}
+
+/* Team list */
+.teamList {
+    display:flex;
+    flex-wrap:wrap;
+    gap:12px;
+}
+.teamMember {
+    background:rgba(255,255,255,0.02);
+    padding:12px;
+    border-radius:10px;
+    flex:1 1 200px;
+    border:1px solid rgba(255,255,255,0.03);
+}
+.teamMember h3 {
+    margin:0 0 6px 0;
+    font-size:16px;
+    color:#60a5fa;
+}
+.teamMember p {
+    font-size:13px;
+    color:#c0c8d0;
+    margin:0;
+}
+
+/* Contact links */
+.contact a {
+    color:#6ee7b7;
+    text-decoration:none;
+    font-weight:600;
+    margin-right:10px;
+}
+.contact a:hover {text-decoration:underline;}
+
+/* Footer */
+.footer {
+    text-align:center;
+    font-size:12px;
+    opacity:0.6;
+    margin-top:20px;
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+    <h1>ℹ About CyberShield</h1>
+    <p>Your personal toolkit to stay safe from scams, phishing, and suspicious links.</p>
+</div>
+
+<div class="section">
+    <h2>Project Overview</h2>
+    <p>CyberShield is a client-side, privacy-first security toolkit that helps users detect scam URLs, QR codes, phishing attempts, and more. All analysis runs locally in your browser and no data is sent externally.</p>
+</div>
+
+<div class="section">
+    <h2>Our Team</h2>
+    <div class="teamList">
+        <div class="teamMember">
+            <h3>Alex Johnson</h3>
+            <p>Lead Developer & Security Researcher</p>
+        </div>
+        <div class="teamMember">
+            <h3>Maria Lee</h3>
+            <p>UI/UX Designer & Frontend Developer</p>
+        </div>
+        <div class="teamMember">
+            <h3>Rahul Sharma</h3>
+            <p>Backend & Database Specialist</p>
+        </div>
+    </div>
+</div>
+
+<div class="section contact">
+    <h2>Contact / Support</h2>
+    <p>Reach out for support, feedback, or collaboration:</p>
+    <a href="mailto:support@cybershield.io">Email</a>
+    <a href="https://github.com/cybershield" target="_blank">GitHub</a>
+    <a href="https://twitter.com/cybershield" target="_blank">Twitter</a>
+</div>
+
+<div class="footer">
+    © 2025 CyberShield Project — All rights reserved
+</div>
+
+</body>
+</html>

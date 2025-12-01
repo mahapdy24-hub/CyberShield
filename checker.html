@@ -1,0 +1,669 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Real-time URL Checker — CyberShield</title>
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<style>
+    :root{
+  --bg:#071022; 
+  --panel:#0b1220; 
+  --muted:#9fb0c8;
+  --accent1:#6ee7b7; 
+  --accent2:#60a5fa; 
+  --danger:#ff6b6b; 
+  --good:#34d399;
+  --glass: rgba(255,255,255,0.03);
+}
+
+*{box-sizing:border-box;}
+html,body{
+  height:100%;
+  margin:0;
+  font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial;
+  color:var(--muted);
+  background:linear-gradient(180deg,var(--bg),#04121b);
+  -webkit-font-smoothing:antialiased;
+}
+
+.wrap{
+  max-width:1100px;
+  margin:28px auto;
+  padding:20px;
+  position:relative;
+  z-index:1;
+}
+
+header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
+  margin-bottom:18px;
+  flex-wrap:wrap;
+}
+
+h1{
+  color:var(--accent2);
+  margin:0;
+  font-size:20px;
+  text-shadow: 0 0 4px #60a5fa, 0 0 8px #6ee7b7;
+  animation: glow 2.5s infinite alternate;
+}
+
+@keyframes glow{
+  0%{ text-shadow:0 0 2px #60a5fa,0 0 6px #6ee7b7; }
+  50%{ text-shadow:0 0 8px #60a5fa,0 0 16px #6ee7b7; }
+  100%{ text-shadow:0 0 4px #60a5fa,0 0 10px #6ee7b7; }
+}
+
+p.lead{
+  margin:0;
+  color:var(--muted);
+  font-size:13px;
+}
+
+.topControls{
+  display:flex;
+  gap:10px;
+  align-items:center;
+  flex-wrap:wrap;
+}
+
+.btn{
+  padding:10px 12px;
+  border-radius:10px;
+  border:0;
+  background:linear-gradient(90deg,var(--accent1),var(--accent2));
+  color:#022;
+  font-weight:700;
+  cursor:pointer;
+  transition:transform 0.2s, box-shadow 0.3s;
+}
+.btn:hover{
+  transform: scale(1.05);
+  box-shadow:0 0 10px var(--accent1), 0 0 15px var(--accent2);
+}
+.btn.ghost{
+  background:transparent;
+  border:1px solid rgba(255,255,255,0.04);
+  color:var(--muted);
+}
+
+/* ---------------- GRID LAYOUT ---------------- */
+.grid{
+  display:grid;
+  grid-template-columns:1fr 360px;
+  gap:16px;
+}
+@media (max-width:980px){
+  .grid{grid-template-columns:1fr;}
+  .rightCol{order:2;}
+}
+
+/* ---------------- CARD ---------------- */
+.card{
+  background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+  padding:16px;
+  border-radius:12px;
+  border:1px solid rgba(255,255,255,0.03);
+  backdrop-filter:blur(8px);
+  position:relative;
+  overflow:hidden;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+.card:hover{
+  transform: translateY(-6px);
+  box-shadow:0 0 25px var(--accent2),0 0 40px var(--accent1);
+}
+
+/* ---------------- INPUT ---------------- */
+.inputRow{
+  display:flex;
+  gap:8px;
+  align-items:center;
+}
+input[type="text"]{
+  flex:1;
+  padding:12px;
+  border-radius:10px;
+  border:1px solid rgba(255,255,255,0.03);
+  background:transparent;
+  color:var(--muted);
+  outline:none;
+  font-size:15px;
+  transition:border 0.3s, box-shadow 0.3s;
+}
+input[type="text"]:focus{
+  border-color:var(--accent2);
+  box-shadow:0 0 8px var(--accent2);
+}
+
+/* ---------------- SCORE BUBBLE & LIQUID ---------------- */
+.scoreArea{display:flex;gap:12px;align-items:center;flex-wrap:wrap;}
+.bubble{
+  width:110px;
+  height:110px;
+  border-radius:50%;
+  background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(0,0,0,0.05));
+  position:relative;
+  overflow:hidden;
+  border:1px solid rgba(255,255,255,0.02);
+  animation: bubblePulse 3s infinite alternate;
+}
+@keyframes bubblePulse{
+  0%{ transform: scale(0.98); box-shadow:0 0 5px rgba(0,255,128,0.3);}
+  50%{ transform: scale(1.02); box-shadow:0 0 12px rgba(0,255,128,0.5);}
+  100%{ transform: scale(0.98); box-shadow:0 0 5px rgba(0,255,128,0.3);}
+}
+
+.liquid{
+  position:absolute;
+  left:-10%;
+  bottom:-60%;
+  width:120%;
+  height:220%;
+  border-radius:40%;
+  transform:translateY(100%);
+  transition:transform 700ms cubic-bezier(.2,.9,.2,1),background 400ms linear;
+  filter:blur(6px);
+  opacity:0.95;
+}
+
+.scoreVal{
+  position:relative;
+  z-index:2;
+  font-weight:900;
+  color:#012;
+  text-align:center;
+  margin-top:34px;
+  font-size:20px;
+}
+
+/* ---------------- METER ---------------- */
+.meterBox{margin-top:12px;}
+.meter{
+  height:14px;
+  background:rgba(255,255,255,0.03);
+  border-radius:999px;
+  overflow:hidden;
+}
+.meter > i{
+  display:block;
+  height:100%;
+  width:0%;
+  transition:width 300ms ease, background 300ms ease;
+}
+
+/* ---------------- OBSERVATIONS ---------------- */
+.observations{margin-top:12px;display:grid;gap:8px;}
+.obs{
+  padding:10px;
+  border-radius:10px;
+  background:rgba(0,0,0,0.18);
+  font-size:14px;
+  color:var(--muted);
+  animation: fadeIn 0.5s ease forwards;
+}
+@keyframes fadeIn{
+  0%{opacity:0; transform:translateY(8px);}
+  100%{opacity:1; transform:translateY(0);}
+}
+
+/* ---------------- DB LIST ---------------- */
+.dbList{
+  max-height:180px;
+  overflow:auto;
+  padding:8px;
+  border-radius:8px;
+  background:rgba(255,255,255,0.01);
+}
+.dbItem{
+  padding:8px;
+  border-radius:8px;
+  background:rgba(255,255,255,0.02);
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  font-weight:700;
+  color:var(--muted);
+  margin-bottom:8px;
+  transition:background 0.3s,color 0.3s;
+}
+.dbItem.match{
+  background:linear-gradient(90deg, rgba(255,100,100,0.06), rgba(255,100,100,0.02));
+  color:var(--danger);
+}
+
+/* ---------------- HISTORY ---------------- */
+.history{
+  max-height:220px;
+  overflow:auto;
+  margin-top:8px;
+}
+.hRow{
+  display:flex;
+  justify-content:space-between;
+  padding:8px;
+  border-radius:8px;
+  background:rgba(255,255,255,0.01);
+  margin-bottom:8px;
+  font-size:13px;
+}
+
+/* ---------------- TAGS ---------------- */
+.tag{
+  display:inline-block;
+  background:rgba(255,255,255,0.02);
+  padding:6px 8px;
+  border-radius:8px;
+  font-weight:700;
+}
+
+/* ---------------- FOOTER ---------------- */
+footer{
+  margin-top:18px;
+  text-align:center;
+  color:var(--muted);
+  font-size:13px;
+}
+
+/* ---------------- RESPONSIVE ---------------- */
+@media (max-width:768px){
+  .inputRow{flex-direction:column; gap:6px;}
+  .grid{grid-template-columns:1fr;}
+  .scoreArea{justify-content:center;}
+}
+
+</style>
+
+</head>
+<body>
+  <div class="wrap" role="main" aria-labelledby="pageTitle">
+    <header>
+      <div>
+        <h1 id="pageTitle">Real-time URL Checker</h1>
+        <p class="lead">Type or paste a URL — the checker updates live and gives a heuristic scam score (0–100).</p>
+      </div>
+      <div class="topControls">
+        <button class="btn" onclick="manualCheck()">Check Now</button>
+        <button class="btn ghost" onclick="clearAll()">Clear</button>
+      </div>
+    </header>
+
+    <main class="grid" aria-live="polite">
+      <!-- LEFT: main checker -->
+      <section class="card" aria-label="URL analysis area">
+        <div class="inputRow">
+          <input id="urlInput" type="text" placeholder="Paste URL or domain (example: https://example.com)" aria-label="URL input">
+          <button class="btn" onclick="manualCheck()">Analyze</button>
+        </div>
+
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px">
+          <div class="small">Live detection: <strong id="liveState">ON</strong></div>
+          <div class="small">Saved DB matches: <span id="dbMatches">0</span></div>
+        </div>
+
+        <div style="margin-top:18px;display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap">
+          <div class="bubble" role="img" aria-label="scam score bubble">
+            <div class="liquid" id="liquidFill" aria-hidden="true" style="background:linear-gradient(90deg,var(--good),var(--accent2))"></div>
+            <div class="scoreVal" id="scoreValue">0</div>
+          </div>
+
+          <div style="flex:1">
+            <div class="scoreText" id="scoreLabel">Score: 0 — No analysis yet</div>
+            <div class="meterBox">
+              <div class="meter" aria-hidden="true">
+                <i id="meterFill" style="background:linear-gradient(90deg,var(--good),var(--accent2));width:0%"></i>
+              </div>
+            </div>
+            <div class="small" style="margin-top:10px">Interpretation: <span id="scoreInterpret">No data</span></div>
+
+            <div style="margin-top:12px">
+              <button class="btn" onclick="copyReport()">Copy Report</button>
+              <button class="btn ghost" onclick="addCurrentToDB()">Flag & Add to DB</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="observations" id="observations" aria-live="polite">
+          <!-- dynamic notes -->
+        </div>
+
+        <div style="margin-top:14px">
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <div class="tag">Heuristics only</div>
+            <div class="tag">Client-side</div>
+            <div class="tag">Privacy-first</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- RIGHT: DB, history, quick rules -->
+      <aside class="card rightCol" aria-label="tools and database">
+        <div class="section">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div style="font-weight:800">Offline Threat DB</div>
+            <div class="small">LocalStorage</div>
+          </div>
+
+          <div style="margin-top:8px;display:flex;gap:8px">
+            <input id="newDomain" type="text" placeholder="add domain (example: bad-site.com)" style="flex:1;padding:8px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.03);color:var(--muted)">
+            <button class="btn" onclick="addToDB()">Add</button>
+          </div>
+
+          <div class="dbList" id="dbList" aria-live="polite" style="margin-top:10px"></div>
+        </div>
+
+        <div class="section">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div style="font-weight:800">Scan History</div>
+            <div class="small"><button class="btn ghost" onclick="clearHistory()">Clear</button></div>
+          </div>
+          <div class="history" id="history"></div>
+        </div>
+
+        <div class="section">
+          <div style="font-weight:800">Quick Rules</div>
+          <ul style="margin-top:8px;color:var(--muted);padding-left:18px">
+            <li>HTTPS missing → higher risk</li>
+            <li>Suspicious keywords (verify, claim, free) → caution</li>
+            <li>Long domains, many hyphens, punycode → warning</li>
+            <li>Matches in DB → strong indicator</li>
+          </ul>
+        </div>
+      </aside>
+    </main>
+
+    <footer>
+      <div class="small">This tool is for training and awareness. It does not collect data externally. Do not enter real credentials in any demo pages.</div>
+    </footer>
+  </div>
+
+<script>
+/* ==============================
+   Real-time URL Checker (Single File)
+   Client-side only, privacy-first
+   ============================== */
+
+/* ---------- Config & Samples ---------- */
+const SAMPLE_DB = [
+  "malicious-example.com",
+  "secure-login-verify.com",
+  "paypa1.com",
+  "freemoney-now.com",
+  "acme-security-notice.com"
+];
+const SUSPICIOUS_KEYWORDS = ["verify","login","secure","update","claim","free","reward","confirm","account","billing","suspend","deactivate","verify-account"];
+const POPULAR_BRANDS = ["google","facebook","amazon","paypal","microsoft","instagram","apple","netflix","linkedin","twitter","github"];
+
+/* ---------- DOM ---------- */
+const urlInput = document.getElementById('urlInput');
+const liquidFill = document.getElementById('liquidFill');
+const scoreValue = document.getElementById('scoreValue');
+const scoreLabel = document.getElementById('scoreLabel');
+const meterFill = document.getElementById('meterFill');
+const scoreInterpret = document.getElementById('scoreInterpret');
+const observations = document.getElementById('observations');
+const dbListEl = document.getElementById('dbList');
+const historyEl = document.getElementById('history');
+const dbMatchesEl = document.getElementById('dbMatches');
+const liveState = document.getElementById('liveState');
+
+let offlineDB = [];
+let history = [];
+
+/* ---------- Persistence keys ---------- */
+const DB_KEY = 'cybershield_db_v1';
+const HISTORY_KEY = 'cybershield_history_v1';
+
+/* ---------- Init ---------- */
+function init(){
+  // load DB & history
+  try{ const raw = JSON.parse(localStorage.getItem(DB_KEY)); if (Array.isArray(raw)) offlineDB = raw; }catch(e){ offlineDB = [] }
+  if (!offlineDB.length){ offlineDB = SAMPLE_DB.slice(); persistDB(); }
+  try{ const rawH = JSON.parse(localStorage.getItem(HISTORY_KEY)); if (Array.isArray(rawH)) history = rawH; }catch(e){ history = [] }
+  renderDB();
+  renderHistory();
+  updateDBMatchCount();
+}
+init();
+
+/* ---------- Helpers ---------- */
+function parseURL(s){
+  if (!s) return null;
+  let t = s.trim();
+  if (!/^[a-zA-Z][a-zA-Z0-9+.-]*:\/\//.test(t)) t = 'https://' + t;
+  try{ return new URL(t); }catch(e){ return null; }
+}
+function hostFrom(s){
+  const u = parseURL(s);
+  if (u) return u.hostname.toLowerCase();
+  // fallback
+  if (!s) return '';
+  return s.split('/')[0].toLowerCase();
+}
+function isIP(host){
+  return /^\d{1,3}(\.\d{1,3}){3}$/.test(host);
+}
+
+/* ---------- Scoring ---------- */
+function computeScore(input){
+  let score = 50; // baseline
+  const notes = [];
+  const u = parseURL(input);
+
+  // HTTPS (good)
+  if (u && u.protocol === 'https:'){ score += 18; notes.push({type:'good',text:'Uses HTTPS'}); }
+  else { score -= 20; notes.push({type:'bad',text:'No HTTPS / scheme missing'}); }
+
+  const host = hostFrom(input);
+  if (!host){ notes.push({type:'bad',text:'Could not parse host'}); score -= 15; return finalize(score,notes,host); }
+
+  // DB match (heavy)
+  const matches = offlineDB.filter(d => host === d || host.endsWith('.' + d));
+  if (matches.length){ notes.push({type:'bad',text:'Matches offline DB: ' + matches.join(', ')}); score -= 45; }
+
+  // suspicious keywords
+  let kwCount = 0;
+  SUSPICIOUS_KEYWORDS.forEach(k => { if (input.toLowerCase().includes(k) || host.includes(k)) kwCount++; });
+  if (kwCount){ notes.push({type:'bad',text:`Contains suspicious keyword(s): ${kwCount}`}); score -= Math.min(30, kwCount * 7); }
+
+  // free hosting
+  const freeHosts = ["000webhost","weebly","wixsite","blogspot","wordpress","github.io","herokuapp"];
+  const fh = freeHosts.filter(f => host.includes(f));
+  if (fh.length){ notes.push({type:'bad',text:'Free hosting detected: ' + fh.join(', ')}); score -= 10; }
+
+  // hyphens and length
+  const hyphens = (host.match(/-/g) || []).length;
+  if (hyphens >= 3){ notes.push({type:'bad',text:'Many hyphens in domain'}); score -= 6; }
+  if (input.length > 80){ notes.push({type:'bad',text:'Very long URL'}); score -= 6; }
+
+  // IP address
+  if (isIP(host)){ notes.push({type:'bad',text:'Host is an IP address'}); score -= 12; }
+
+  // punycode
+  if (host.includes('xn--')){ notes.push({type:'bad',text:'Punycode / IDN detected — possible typosquat'}); score -= 12; }
+
+  // brand-like fragments
+  POPULAR_BRANDS.forEach(b=>{
+    if (host.includes(b) && !(host === b || host.endsWith('.' + b) || host.endsWith('.' + b + '.com'))){
+      notes.push({type:'bad',text:`Brand-like fragment: ${b} (typosquat hint)`}); score -= 8;
+    }
+  });
+
+  return finalize(score,notes,host);
+}
+
+function finalize(score, notes, host){
+  score = Math.max(0, Math.min(100, score));
+  const badCount = notes.filter(n=>n.type==='bad').length;
+  if (badCount >= 4) score = Math.min(score, 30);
+  if (badCount >= 6) score = Math.min(score, 12);
+  if (!notes.length) notes.push({type:'good',text:'No obvious heuristic flags — still not a guarantee.'});
+  return {score, notes, host};
+}
+
+/* ---------- UI render ---------- */
+function renderResult(res, save=true){
+  const percent = res.score;
+  // liquid transform: bottom translation (0% means empty — we map so higher score -> more "risk fill")
+  liquidFill.style.transform = `translateY(${100 - percent}%)`;
+  scoreValue.textContent = res.score;
+  meterFill.style.width = res.score + '%';
+
+  // color by threshold
+  if (res.score < 40){
+    liquidFill.style.background = `linear-gradient(90deg,var(--good),var(--accent2))`;
+    meterFill.style.background = `linear-gradient(90deg,var(--good),var(--accent2))`;
+    scoreInterpretation('Low risk — heuristic');
+  } else if (res.score < 70){
+    liquidFill.style.background = `linear-gradient(90deg,#fef08a,#fb923c)`;
+    meterFill.style.background = `linear-gradient(90deg,#fef08a,#fb923c)`;
+    scoreInterpretation('Suspicious — investigate');
+  } else {
+    liquidFill.style.background = `linear-gradient(90deg,var(--danger),#ffb4b4)`;
+    meterFill.style.background = `linear-gradient(90deg,var(--danger),#ffb4b4)`;
+    scoreInterpretation('High risk — likely scam');
+  }
+
+  // observations
+  observations.innerHTML = '';
+  res.notes.forEach(n=>{
+    const d = document.createElement('div');
+    d.className = 'obs';
+    d.textContent = (n.type==='bad' ? '⚠️ ' : '✅ ') + n.text;
+    observations.appendChild(d);
+  });
+
+  // DB ui highlight and counts
+  renderDB(res.host);
+  updateDBMatchCount();
+
+  // save to history optionally
+  if (save) saveHistory(res);
+}
+
+/* ---------- Interpretation ---------- */
+function scoreInterpretation(txt){ scoreInterpret.textContent = txt; scoreLabel.textContent = `Score: ${scoreValue.textContent}`; }
+
+/* ---------- Input handlers (live) ---------- */
+let liveTimer = null;
+urlInput.addEventListener('input', ()=>{
+  // live detection enabled
+  const val = urlInput.value.trim();
+  if (!val){
+    // reset
+    scoreValue.textContent = '0';
+    meterFill.style.width = '0%';
+    liquidFill.style.transform = 'translateY(100%)';
+    observations.innerHTML = '';
+    return;
+  }
+  if (liveTimer) clearTimeout(liveTimer);
+  // small debounce for typing
+  liveTimer = setTimeout(()=>{
+    const res = computeScore(val);
+    renderResult(res,false); // don't save intermediate to history
+  }, 250);
+});
+
+/* ---------- Manual check ---------- */
+function manualCheck(){
+  const val = urlInput.value.trim();
+  if (!val){ alert('Enter a URL or domain to check'); return; }
+  const res = computeScore(val);
+  renderResult(res,true); // save to history
+}
+
+/* ---------- DB management ---------- */
+function persistDB(){ try{ localStorage.setItem(DB_KEY, JSON.stringify(offlineDB)); }catch(e){} }
+function renderDB(activeHost=''){
+  dbListEl.innerHTML = '';
+  offlineDB.forEach(d=>{
+    const div = document.createElement('div');
+    div.className = 'dbItem' + ((activeHost===d || (activeHost && activeHost.endsWith('.'+d))) ? ' match' : '');
+    div.innerHTML = `<span>${d}</span>`;
+    const rm = document.createElement('button');
+    rm.textContent = 'Remove'; rm.className='btn'; rm.style.padding='6px 8px';
+    rm.onclick = ()=>{ offlineDB = offlineDB.filter(x=>x!==d); persistDB(); renderDB(activeHost); updateDBMatchCount(); };
+    div.appendChild(rm);
+    dbListEl.appendChild(div);
+  });
+}
+function addToDB(){
+  const val = document.getElementById('newDomain').value.trim().toLowerCase();
+  if (!val) return alert('Enter a domain like example.com');
+  if (!offlineDB.includes(val)) offlineDB.unshift(val);
+  document.getElementById('newDomain').value = '';
+  persistDB(); renderDB(); updateDBMatchCount();
+}
+function updateDBMatchCount(){
+  const host = hostFrom(urlInput.value);
+  const matches = offlineDB.filter(d => host===d || (host && host.endsWith('.'+d)));
+  document.getElementById('dbMatches').textContent = matches.length;
+}
+
+/* ---------- History ---------- */
+function saveHistory(res){
+  const rec = {time: Date.now(), host: res.host||'(invalid)', score: res.score, notes: res.notes.slice(0,4).map(n=>n.text)};
+  history.unshift(rec);
+  history = history.slice(0,200);
+  try{ localStorage.setItem(HISTORY_KEY, JSON.stringify(history)); }catch(e){}
+  renderHistory();
+}
+function renderHistory(){
+  historyEl.innerHTML = '';
+  history.forEach(h=>{
+    const r = document.createElement('div'); r.className='hRow';
+    r.innerHTML = `<div><div style="font-weight:800">${h.host}</div><div class="small">${new Date(h.time).toLocaleString()}</div></div><div style="text-align:right"><div style="font-weight:900">${h.score}</div><div class="small">${h.notes.join(' • ')}</div></div>`;
+    historyEl.appendChild(r);
+  });
+}
+function clearHistory(){
+  if (!confirm('Clear scan history?')) return;
+  history = []; localStorage.removeItem(HISTORY_KEY); renderHistory();
+}
+
+/* ---------- Copy report ---------- */
+async function copyReport(){
+  const host = hostFrom(urlInput.value) || '(empty)';
+  const score = scoreValue.textContent;
+  const notes = Array.from(observations.querySelectorAll('.obs')).map(n=>n.textContent);
+  const txt = `CyberShield Report\nHost: ${host}\nScore: ${score}\nNotes:\n- ${notes.join('\n- ')}\n(Heuristic only)`;
+  try{
+    await navigator.clipboard.writeText(txt);
+    alert('Report copied to clipboard');
+  }catch(e){
+    prompt('Copy manually:', txt);
+  }
+}
+
+/* ---------- Add current host to DB ---------- */
+function addCurrentToDB(){
+  const host = hostFrom(urlInput.value);
+  if (!host) return alert('No host to add.');
+  if (!offlineDB.includes(host)){
+    offlineDB.unshift(host); persistDB(); renderDB(host); updateDBMatchCount();
+    alert('Added to local offline DB (localStorage only).');
+  } else alert('Already in DB.');
+}
+
+/* ---------- Clear UI ---------- */
+function clearAll(){ if (!confirm('Clear input and UI?')) return; urlInput.value=''; observations.innerHTML=''; scoreValue.textContent='0'; meterFill.style.width='0%'; liquidFill.style.transform='translateY(100%)'; }
+
+/* ---------- Initialize DB & History (load from storage) ---------- */
+(function loadPersist(){
+  try{ const db = JSON.parse(localStorage.getItem(DB_KEY)); if (Array.isArray(db)) offlineDB = db; }catch(e){}
+  if (!offlineDB || !offlineDB.length){ offlineDB = SAMPLE_DB.slice(); persistDB(); }
+  try{ const h = JSON.parse(localStorage.getItem(HISTORY_KEY)); if (Array.isArray(h)) history = h; }catch(e){}
+  renderDB(); renderHistory();
+  updateDBMatchCount();
+})();
+
+/* ---------- Accessibility: enter key triggers check ---------- */
+urlInput.addEventListener('keydown', (e)=>{ if (e.key === 'Enter') manualCheck(); });
+
+</script>
+</body>
+</html>

@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>CyberShield — Offline Scam Database</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+body {
+    margin:0;
+    font-family:"Poppins", sans-serif;
+    background:#0d1117;
+    color:#fff;
+    padding:20px;
+}
+
+h1{
+    text-align:center;
+    font-size:32px;
+    color:#58a6ff;
+    margin-bottom:12px;
+    background: linear-gradient(90deg, #6ee7b7, #60a5fa);
+    -webkit-background-clip: text;
+    color: transparent;
+    animation: glow 3s infinite alternate;
+}
+@keyframes glow{
+    0%{filter:drop-shadow(0 0 5px #6ee7b7);}
+    50%{filter:drop-shadow(0 0 15px #60a5fa);}
+    100%{filter:drop-shadow(0 0 5px #6ee7b7);}
+}
+
+.container{
+    max-width:700px;
+    margin:auto;
+    padding:10px;
+}
+
+/* Input Row */
+.inputRow{
+    display:flex;
+    gap:8px;
+    margin-bottom:12px;
+}
+.inputRow input{
+    flex:1;
+    padding:12px;
+    border-radius:10px;
+    border:1px solid rgba(255,255,255,0.05);
+    background:#161b22;
+    color:#fff;
+}
+.inputRow button{
+    padding:12px 16px;
+    border:none;
+    border-radius:10px;
+    background:#238636;
+    color:#fff;
+    font-weight:700;
+    cursor:pointer;
+    transition:0.3s;
+}
+.inputRow button:hover{background:#2ea043;}
+
+/* List */
+.dbList{
+    background:rgba(255,255,255,0.02);
+    border-radius:12px;
+    padding:12px;
+    max-height:350px;
+    overflow:auto;
+    border:1px solid rgba(255,255,255,0.03);
+}
+.dbItem{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:8px;
+    border-radius:8px;
+    margin-bottom:6px;
+    background:rgba(255,255,255,0.01);
+    transition:0.3s;
+}
+.dbItem.match{background:rgba(255,100,100,0.06); color:#ff6b6b;}
+.dbItem button{
+    padding:6px 10px;
+    border:none;
+    border-radius:8px;
+    background:#e63946;
+    color:#fff;
+    cursor:pointer;
+    font-size:12px;
+}
+.dbItem button:hover{background:#ff4c4c;}
+
+/* Search */
+.searchBox{
+    margin-bottom:12px;
+    display:flex;
+    gap:8px;
+}
+.searchBox input{
+    flex:1;
+    padding:10px;
+    border-radius:8px;
+    border:1px solid rgba(255,255,255,0.05);
+    background:#161b22;
+    color:#fff;
+}
+.searchBox button{
+    padding:10px 12px;
+    border-radius:8px;
+    border:none;
+    background:#60a5fa;
+    font-weight:700;
+    cursor:pointer;
+}
+.searchBox button:hover{background:#3b82f6;}
+
+/* Footer */
+.footer{
+    text-align:center;
+    margin-top:20px;
+    font-size:13px;
+    opacity:0.6;
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+<h1>📁 Offline Scam Database Manager</h1>
+
+<!-- Add Domain -->
+<div class="inputRow">
+    <input type="text" id="newDomain" placeholder="Enter domain (example: bad-site.com)">
+    <button onclick="addDomain()">Add Domain</button>
+    <button onclick="clearAddInput()">Clear</button>
+</div>
+
+<!-- Search -->
+<div class="searchBox">
+    <input type="text" id="searchInput" placeholder="Search domains">
+    <button onclick="searchDB()">Search</button>
+    <button onclick="clearSearch()">Clear</button>
+</div>
+
+<!-- Database List -->
+<div class="dbList" id="dbList"></div>
+
+<div class="footer">
+    CyberShield — Offline DB stored in your browser only (localStorage)
+</div>
+</div>
+
+<script>
+let offlineDB = [];
+const DB_KEY = 'cybershield_db_v1';
+
+// Load DB from localStorage
+function loadDB(){
+    try{
+        const stored = JSON.parse(localStorage.getItem(DB_KEY));
+        if(Array.isArray(stored)) offlineDB = stored;
+    }catch(e){ offlineDB = [];}
+    if(!offlineDB.length){
+        offlineDB = ['malicious-example.com','freemoney-now.com','secure-login.com'];
+        saveDB();
+    }
+    renderDB();
+}
+
+// Save DB to localStorage
+function saveDB(){
+    localStorage.setItem(DB_KEY, JSON.stringify(offlineDB));
+}
+
+// Render DB list with optional filter
+function renderDB(filter=''){
+    const dbList = document.getElementById('dbList');
+    dbList.innerHTML='';
+    let filtered = offlineDB.filter(d=>d.includes(filter.toLowerCase()));
+    filtered.forEach(d=>{
+        const div = document.createElement('div');
+        div.className='dbItem';
+        div.innerHTML = `<span>${d}</span>`;
+        const rm = document.createElement('button');
+        rm.textContent='Remove';
+        rm.onclick=()=>{ offlineDB=offlineDB.filter(x=>x!==d); saveDB(); renderDB(filter); };
+        div.appendChild(rm);
+        dbList.appendChild(div);
+    });
+    if(filtered.length===0) dbList.innerHTML='<p style="color:#9fb0c8;">No domains found.</p>';
+}
+
+// Add domain
+function addDomain(){
+    const input = document.getElementById('newDomain');
+    let val = input.value.trim().toLowerCase();
+    if(!val) return alert('Enter a domain');
+    if(!offlineDB.includes(val)) offlineDB.unshift(val);
+    saveDB();
+    renderDB();
+    input.value='';
+}
+
+// Search DB
+function searchDB(){
+    const query = document.getElementById('searchInput').value.trim().toLowerCase();
+    renderDB(query);
+}
+
+// Clear Add Domain input
+function clearAddInput(){
+    document.getElementById('newDomain').value='';
+}
+
+// Clear Search input and reset DB list
+function clearSearch(){
+    document.getElementById('searchInput').value='';
+    renderDB();
+}
+
+loadDB();
+</script>
+
+</body>
+</html>

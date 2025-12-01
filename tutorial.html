@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>CyberShield — Cyber Safety Tutorial</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+body {
+    margin:0;
+    font-family: "Poppins", sans-serif;
+    background: #0d1117;
+    color: #fff;
+    line-height: 1.6;
+    padding: 20px;
+}
+
+/* Header */
+.header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+.header h1 {
+    font-size: 32px;
+    margin-bottom: 6px;
+    background: linear-gradient(90deg, #6ee7b7, #60a5fa);
+    -webkit-background-clip: text;
+    color: transparent;
+    animation: glow 3s infinite alternate;
+}
+.header p {
+    color: #9fb0c8;
+    font-size: 14px;
+}
+
+/* Glow animation */
+@keyframes glow {
+    0% { filter: drop-shadow(0 0 5px #6ee7b7); }
+    50% { filter: drop-shadow(0 0 15px #60a5fa); }
+    100% { filter: drop-shadow(0 0 5px #6ee7b7); }
+}
+
+/* Tutorial content */
+.tutorial {
+    max-width: 900px;
+    margin: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.section {
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 12px;
+    padding: 20px;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+.section:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 0 15px #1f6feb55;
+}
+
+.section h2 {
+    color: #58a6ff;
+    margin-bottom: 10px;
+}
+.section p {
+    color: #c9d1d9;
+}
+.section ul {
+    padding-left: 20px;
+}
+.section li {
+    margin-bottom: 8px;
+}
+
+/* Footer */
+.footer {
+    text-align: center;
+    margin-top: 30px;
+    font-size: 12px;
+    opacity: 0.6;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .tutorial {
+        padding: 0 10px;
+    }
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+    <h1>🎓 Cyber Safety Tutorial</h1>
+    <p>Learn how to stay safe online and protect yourself from scams and phishing attacks.</p>
+</div>
+
+<div class="tutorial">
+
+    <div class="section">
+        <h2>1. Recognize Suspicious URLs</h2>
+        <p>Always check the URL before clicking. Look for:</p>
+        <ul>
+            <li>HTTPS & secure padlock</li>
+            <li>Misspelled domain names</li>
+            <li>Extra hyphens or unusual characters</li>
+        </ul>
+    </div>
+
+    <div class="section">
+        <h2>2. Email & Phishing Awareness</h2>
+        <p>Scammers often send emails pretending to be trusted services. Watch out for:</p>
+        <ul>
+            <li>Urgent requests for passwords or payment</li>
+            <li>Suspicious attachments or links</li>
+            <li>Generic greetings instead of your name</li>
+        </ul>
+    </div>
+
+    <div class="section">
+        <h2>3. QR Codes Safety</h2>
+        <p>QR codes can hide malicious URLs. Always:</p>
+        <ul>
+            <li>Verify the source before scanning</li>
+            <li>Use trusted QR scanner apps with safety checks</li>
+            <li>Check the decoded URL before opening</li>
+        </ul>
+    </div>
+
+    <div class="section">
+        <h2>4. Password & Account Security</h2>
+        <ul>
+            <li>Use strong, unique passwords</li>
+            <li>Enable Two-Factor Authentication (2FA)</li>
+            <li>Never share credentials via email or chat</li>
+        </ul>
+    </div>
+
+    <div class="section">
+        <h2>5. Safe Browsing Habits</h2>
+        <ul>
+            <li>Keep your browser and OS updated</li>
+            <li>Avoid clicking unknown pop-ups</li>
+            <li>Use ad-blockers and anti-tracking tools</li>
+        </ul>
+    </div>
+
+    <div class="section">
+        <h2>6. Offline Threat DB & Reporting</h2>
+        <p>CyberShield allows you to:</p>
+        <ul>
+            <li>Check URLs against an offline scam database</li>
+            <li>Report suspicious links safely</li>
+            <li>Learn patterns of phishing & fraud</li>
+        </ul>
+    </div>
+
+</div>
+
+<div class="footer">
+    © 2025 CyberShield Project — Learn, Detect, and Stay Safe
+</div>
+
+</body>
+</html>

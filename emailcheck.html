@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Email Verifier — CyberShield</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+:root{
+  --bg:#071022; 
+  --panel:#0b1220; 
+  --muted:#9fb0c8;
+  --accent1:#6ee7b7; 
+  --accent2:#60a5fa; 
+  --danger:#ff6b6b; 
+  --good:#34d399;
+}
+body{
+  margin:0;
+  font-family:Inter, sans-serif;
+  background:linear-gradient(180deg,var(--bg),#04121b);
+  color:var(--muted);
+  min-height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:flex-start;
+  padding:20px;
+}
+.container{
+  background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+  border-radius:12px;
+  padding:24px;
+  width:100%;
+  max-width:500px;
+  box-shadow:0 0 20px rgba(0,255,255,0.1);
+}
+h1{
+  color:var(--accent2);
+  margin-bottom:12px;
+  text-align:center;
+  text-shadow: 0 0 5px #60a5fa, 0 0 10px #6ee7b7;
+}
+p.lead{
+  font-size:14px;
+  margin-bottom:20px;
+  text-align:center;
+}
+input[type="text"]{
+  width:100%;
+  padding:12px;
+  border-radius:8px;
+  border:1px solid rgba(255,255,255,0.03);
+  background:transparent;
+  color:var(--muted);
+  margin-bottom:12px;
+  font-size:15px;
+}
+button{
+  padding:10px 12px;
+  border-radius:8px;
+  border:none;
+  background:linear-gradient(90deg,var(--accent1),var(--accent2));
+  color:#022;
+  font-weight:700;
+  cursor:pointer;
+  margin-right:6px;
+  transition: transform 0.2s, box-shadow 0.3s;
+}
+button:hover{
+  transform: scale(1.05);
+  box-shadow:0 0 10px var(--accent1),0 0 15px var(--accent2);
+}
+#result{
+  margin-top:20px;
+  padding:12px;
+  border-radius:10px;
+  background:rgba(255,255,255,0.02);
+  font-size:14px;
+}
+.clearBtn{
+  background:rgba(255,255,255,0.04);
+  color:var(--muted);
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>📩 Email Verifier</h1>
+  <p class="lead">Check if an email looks suspicious or possibly fake. This is a heuristic tool for awareness.</p>
+  
+  <input type="text" id="emailInput" placeholder="Enter email address">
+  <div style="display:flex; gap:6px;">
+    <button onclick="checkEmail()">Verify Email</button>
+    <button class="clearBtn" onclick="clearInput()">Clear</button>
+  </div>
+
+  <div id="result">Result will appear here...</div>
+</div>
+
+<script>
+const emailInput = document.getElementById('emailInput');
+const result = document.getElementById('result');
+
+function checkEmail(){
+  const email = emailInput.value.trim();
+  if(!email){
+    alert('Please enter an email address.');
+    return;
+  }
+
+  // Simple heuristics
+  let score = 50; // baseline
+  const notes = [];
+
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
+    notes.push('⚠️ Invalid email format');
+    score -= 40;
+  } else {
+    notes.push('✅ Valid format');
+  }
+
+  const suspiciousWords = ['free','verify','update','login','secure','support'];
+  suspiciousWords.forEach(word=>{
+    if(email.toLowerCase().includes(word)){
+      notes.push(`⚠️ Contains suspicious word: "${word}"`);
+      score -= 10;
+    }
+  });
+
+  if(email.length > 50){
+    notes.push('⚠️ Email is unusually long');
+    score -= 10;
+  }
+
+  score = Math.max(0, Math.min(100, score));
+
+  let status = '';
+  if(score >= 70) status = '✅ Likely Safe';
+  else if(score >= 40) status = '⚠️ Suspicious';
+  else status = '🚨 Possibly Fake / Scam';
+
+  result.innerHTML = `<strong>Status:</strong> ${status}<br><strong>Score:</strong> ${score}<br>${notes.join('<br>')}`;
+}
+
+function clearInput(){
+  emailInput.value = '';
+  result.innerHTML = 'Result will appear here...';
+}
+</script>
+</body>
+</html>
